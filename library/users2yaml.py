@@ -2,7 +2,6 @@
 # Convert users from puppet to yaml
 #
 
-import glob
 import os
 import re
 from contextlib import contextmanager
@@ -23,7 +22,8 @@ def working_directory(path):
 
 
 def strip_comments(text):
-    """Strip comments from text, note that it does not catch all cases, eg. it won't strip <<'blah # something  ' # comment >> """
+    """Strip comments from text, note that it does not catch all cases, eg.
+    it won't strip <<'blah # something  ' # comment >> """
     arr = []
     re_strip = re.compile("([^#]*)")
     for x in text.splitlines():
@@ -33,7 +33,7 @@ def strip_comments(text):
         if '#' in x and res[0].count("'") == 1:
             arr.append(x)
             continue
-        if len(res[0]) == 0:
+        if not res[0]:
             continue
         arr.append(res[0])
     return '\n'.join(arr)
@@ -121,7 +121,8 @@ def run_module():
     """
 
     def add_rec(rtype, name, attr_list):
-        """Add records. Use to build the final output while traversing the parse tree"""
+        """Add records. Use to build the final output while traversing the
+        parse tree."""
         # filter values
         attrs = dict(attr_list)
         if module.params['skip_absent'] and attrs.get('ensure') == 'absent':
@@ -137,7 +138,7 @@ def run_module():
                 users[name]['name'] = name
 
     parser = makeGrammar(grammar, {'add_rec': add_rec})
-    res = parser(text).traverse()
+    parser(text).traverse()
 
     # 5. prepare output
 
@@ -158,8 +159,6 @@ def run_module():
 
     with working_directory(dst_dir):
         # 6. load previous output and look for changes
-        prev_groups = {}
-
         changed = False
         for (dtype, data) in [('groups', groups), ('users', users)]:
             fname = dtype + '.yml'
@@ -191,8 +190,7 @@ def run_module():
                 with open(fname, 'w') as f:
                     f.write(yaml.dump({dtype: data},
                                       default_flow_style=False,
-                                      allow_unicode=True)
-                            )
+                                      allow_unicode=True))
     # 8. return results
     module.exit_json(changed=changed, warnings=warnings,
                      msg="; ".join(msg_arr))
@@ -200,7 +198,6 @@ def run_module():
 
 def main():
     run_module()
-
 
 if __name__ == '__main__':
     main()

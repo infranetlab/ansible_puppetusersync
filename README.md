@@ -1,5 +1,5 @@
-puppetusersync
-=========
+infranetlab.puppetusersync
+==========================
 
 An ansible role to synchronize users and groups defined in puppet to ansible.
 

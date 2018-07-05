@@ -23,10 +23,10 @@ galaxy_info:
   platforms:
     - name: Debian
       versions:
-      - stretch/sid
+      - stretch
 
   galaxy_tags:
-    - user_sync
+    - usersync
     - puppet
 
 dependencies: []
