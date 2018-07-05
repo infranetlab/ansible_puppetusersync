@@ -66,7 +66,7 @@ def run_module():
     dst_dir = module.params['dst_dir']
     user_class = module.params['user_class']
     group_class = module.params['group_class']
-    msg_arr = [] # collect some info messages
+    msg_arr = []  # collect some info messages
 
     # check input
     if not os.path.exists(module.params['src_file']):
@@ -136,7 +136,6 @@ def run_module():
                 users[name] = attrs
                 users[name]['name'] = name
 
-
     parser = makeGrammar(grammar, {'add_rec': add_rec})
     res = parser(text).traverse()
 
@@ -171,7 +170,7 @@ def run_module():
 
             # 7. write new output in case of changes
             if not prev_data or not prev_data.get(dtype):
-                msg_arr.append("empty %s" % dtype )
+                msg_arr.append("empty %s" % dtype)
                 changed = True
 
             if prev_data[dtype] != data:
@@ -181,11 +180,12 @@ def run_module():
                 added_set = curr_keys - prev_keys
                 removed_set = prev_keys - curr_keys
 
-                if len( added_set ) > 0:
-                    msg_arr.append("added %s: %s" % (dtype, ", ".join(added_set)))
-                if len( removed_set ) > 0:
-                    msg_arr.append("removed %s: %s" % (dtype, ", ".join(removed_set)))
-
+                if len(added_set) > 0:
+                    msg_arr.append("added %s: %s" %
+                                   (dtype, ", ".join(added_set)))
+                if len(removed_set) > 0:
+                    msg_arr.append("removed %s: %s" %
+                                   (dtype, ", ".join(removed_set)))
 
             if changed:
                 with open(fname, 'w') as f:
@@ -194,7 +194,8 @@ def run_module():
                                       allow_unicode=True)
                             )
     # 8. return results
-    module.exit_json(changed=changed, warnings=warnings, msg="; ".join(msg_arr))
+    module.exit_json(changed=changed, warnings=warnings,
+                     msg="; ".join(msg_arr))
 
 
 def main():
