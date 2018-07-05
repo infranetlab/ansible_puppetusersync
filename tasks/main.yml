@@ -1,0 +1,71 @@
+# Setup users
+#
+# Synopsys:
+# In order to avoid keeping track of absent users we proceed as follows:
+#
+# 1. Define the ranges for the target automated user ids, ie. we assume that users
+#    in this range will not be managed manually. This is done in usync_target_uid_ranges
+# 2. Load user_db
+# 3. Create user diff lists in order to avoid looking through all users. There
+#    are 2 lists: users_to_add, users_to_delete. This step is realized by
+#    user_diffs.py.
+# 4. Loop through the lists accordingly
+#
+# 5. Setup authorized keys and sudo privileges
+#
+# WARNING: Note that it does not handle updates, but rather only inclusion
+#          or deletion of users.
+
+- name: "user_db: load {{ usync_export_dir }}"
+  include_vars:
+    dir: "{{ usync_export_dir }}"
+    name: user_db
+
+- name: Compute user sync lists
+  user_diffs:
+    users: "{{ user_db.users }}"
+    target_uid_ranges: "{{ usync_target_uid_ranges }}"
+    target_gids: "{{ usync_target_gids }}"
+  register: results
+
+- name: Show user diffs
+  debug:
+    var: results
+
+- name: Create groups
+  group:
+    name: "{{ item.value.name }}"
+    gid: "{{ item.value.gid }}"
+    state: present
+  with_dict:
+  - "{{ user_db.groups }}"
+
+- name: Create users
+  become: yes
+  user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    shell: /bin/bash
+    uid: "{{ item.uid}}"
+    group: "{{ item.gid }}"
+    state: present
+  with_items: "{{ results.sync_lists.users_to_add }}"
+
+- name: Delete undefined users from target ranges
+  become: yes
+  user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid}}"
+    remove: yes
+    state: absent
+  with_items: "{{ results.sync_lists.users_to_delete }}"
+
+- name: Set authorized keys
+  become: yes
+  authorized_key:
+    user: "{{ item.name }}"
+    # FIXME Assuming that all keys are ssh-rsa
+    key: "ssh-rsa {{ item.sshkey }} {{item.name}}"
+    state: present
+  with_items: "{{ results.sync_lists.users_to_add }}"
+  when: item.sshkey is defined

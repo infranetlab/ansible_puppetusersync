@@ -1,0 +1,10 @@
+- name: Import puppet users
+  users2yaml:
+    src_file: "{{ usync_puppet_src_file }}"
+    dst_dir: "{{ usync_export_dir }}"
+    skip_absent: "{{ usync_skip_absent }}"
+    target_uid_ranges: "{{ usync_target_uid_ranges }}"
+    target_gids:  "{{ usync_target_gids }}"
+    user_class: "{{ usync_puppet_user_class }}"
+    group_class: "{{ usync_puppet_group_class }}"
+  register: results

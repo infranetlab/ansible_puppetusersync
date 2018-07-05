@@ -1,0 +1,11 @@
+---
+usync_puppet_src_file: "change_me"
+usync_puppet_user_class: "user"
+usync_puppet_group_class: "group"
+usync_export_dir: "change_me"
+usync_skip_absent: yes
+usync_target_uid_ranges:
+  - [1000, 2000]
+usync_target_gids:
+  - mygroup1
+  - mygroup2
