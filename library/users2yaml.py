@@ -59,13 +59,17 @@ def run_module():
         target_uid_ranges=dict(required=True, type="list"),
         target_gids=dict(required=False, type="list"),
         user_class=dict(required=False, type="str", default="user"),
-        group_class=dict(required=False, type="str", default="group")
-
+        users_output_keyname=dict(required=False, type="str", default="target_users"),
+        group_class=dict(required=False, type="str", default="group"),
+        groups_output_keyname=dict(required=False, type="str", default="target_groups")
     )
     module = AnsibleModule(argument_spec=argument_spec)
     dst_dir = module.params['dst_dir']
     user_class = module.params['user_class']
+    users_output_keyname = module.params['users_output_keyname']
     group_class = module.params['group_class']
+    groups_output_keyname = module.params['groups_output_keyname']
+
     msg_arr = []  # collect some info messages
 
     # check input
@@ -160,7 +164,7 @@ def run_module():
     with working_directory(dst_dir):
         # 6. load previous output and look for changes
         changed = False
-        for (dtype, data) in [('groups', groups), ('users', users)]:
+        for (dtype, data) in [(groups_output_keyname, groups), (users_output_keyname, users)]:
             fname = dtype + '.yml'
             prev_data = {}
             if os.path.isfile(fname):
@@ -169,10 +173,9 @@ def run_module():
 
             # 7. write new output in case of changes
             if not prev_data or not prev_data.get(dtype):
-                msg_arr.append("empty %s" % dtype)
+                msg_arr.append("initialized %s" % dtype)
                 changed = True
-
-            if prev_data[dtype] != data:
+            elif prev_data[dtype] != data:
                 changed = True
                 prev_keys = set(prev_data[dtype].keys())
                 curr_keys = set(data.keys())
