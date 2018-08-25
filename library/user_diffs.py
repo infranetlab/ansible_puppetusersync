@@ -1,8 +1,7 @@
-#
-# Compute user diffs
-#
+""" Compute user diffs """
 
 import pwd
+from functools import reduce
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -39,8 +38,9 @@ def run_module():
     #  2. get the list of current users and uids
     curr_users = [x for x in pwd.getpwall() if x.pw_uid in target_uid_set]
     curr_uids = set([x.pw_uid for x in curr_users])
+
     # module.exit_json(changed=True, warnings=warnings,
-    # sync_lists=users)
+    # sync_lists=[users, module.params['target_uid_ranges'], module.params['target_gids']] )
 
     # 3. compute lists
     target_users = [x for x in users.values() if x['gid']

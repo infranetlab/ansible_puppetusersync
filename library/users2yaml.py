@@ -1,13 +1,13 @@
-#
-# Convert users from puppet to yaml
-#
+""" Convert users from puppet to yaml """
 
 import os
 import re
 from contextlib import contextmanager
+from functools import reduce
 
 import yaml
 from ansible.module_utils.basic import AnsibleModule
+
 from parsley import makeGrammar
 
 
@@ -157,9 +157,12 @@ def run_module():
             continue
 
     # delete groups not in target_gids, if it were defined
+    delete_list = []
     for group_name, group in groups.items():
         if (target_gids and group_name not in target_gids):
-            groups.pop(group_name)
+            delete_list.append(group_name)
+    for group_name in delete_list:
+        groups.pop(group_name)
 
     with working_directory(dst_dir):
         # 6. load previous output and look for changes

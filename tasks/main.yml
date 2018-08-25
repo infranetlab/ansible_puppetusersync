@@ -23,7 +23,7 @@
 
 - name: Compute user sync lists
   user_diffs:
-    users: "{{ user_db.users }}"
+    users: "{{ user_db.target_users }}"
     target_uid_ranges: "{{ usync_target_uid_ranges }}"
     target_gids: "{{ usync_target_gids }}"
   register: results
