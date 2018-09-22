@@ -33,12 +33,13 @@
     var: results
 
 - name: Create groups
+  become: yes
   group:
     name: "{{ item.value.name }}"
     gid: "{{ item.value.gid }}"
     state: present
   with_dict:
-  - "{{ user_db.groups }}"
+  - "{{ user_db.target_groups }}"
 
 - name: Create users
   become: yes
